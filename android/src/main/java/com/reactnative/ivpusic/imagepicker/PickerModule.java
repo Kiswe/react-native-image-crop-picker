@@ -270,7 +270,9 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         setConfiguration(options);
         resultCollector = new ResultCollector(promise, multiple);
 
-        permissionsCheck(activity, promise, Arrays.asList(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), new Callable<Void>() {
+        permissionsCheck(activity, promise,
+                Collections.singletonList(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 initiateCamera(activity);
