@@ -370,7 +370,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         resultCollector = new ResultCollector(promise, false);
 
         Uri uri = Uri.parse(options.getString("path"));
-        startCropping(activity, uri);
+        startCropping(activity, uri, true);
     }
 
     private String getBase64StringFromFile(String absoluteFilePath) {
@@ -562,10 +562,11 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
     }
 
-    private void startCropping(Activity activity, Uri uri) {
+    private void startCropping(Activity activity, Uri uri, boolean canBeTransparent) {
         UCrop.Options options = new UCrop.Options();
-        options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-        options.setCompressionQuality(100);
+        options.setCompressionFormat(canBeTransparent
+                ? Bitmap.CompressFormat.PNG : Bitmap.CompressFormat.JPEG);
+        options.setCompressionQuality(90);
         options.setCircleDimmedLayer(cropperCircleOverlay);
         options.setShowCropGrid(showCropGuidelines);
         options.setHideBottomControls(hideBottomControls);
@@ -579,7 +580,8 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
         }
         configureCropperColors(options);
 
-        UCrop.of(uri, Uri.fromFile(new File(this.getTmpDir(activity), UUID.randomUUID().toString() + ".jpg")))
+        UCrop.of(uri, Uri.fromFile(new File(this.getTmpDir(activity),
+                        UUID.randomUUID().toString() + (canBeTransparent ? ".png" : ".jpg"))))
                 .withMaxResultSize(width, height)
                 .withAspectRatio(width, height)
                 .withOptions(options)
@@ -617,7 +619,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
                 }
 
                 if (cropping) {
-                    startCropping(activity, uri);
+                    startCropping(activity, uri, true);
                 } else {
                     try {
                         getAsyncSelection(activity, uri, false);
@@ -643,7 +645,7 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
             if (cropping) {
                 UCrop.Options options = new UCrop.Options();
                 options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-                startCropping(activity, uri);
+                startCropping(activity, uri, false);
             } else {
                 try {
                     resultCollector.setWaitCount(1);
@@ -712,3 +714,4 @@ class PickerModule extends ReactContextBaseJavaModule implements ActivityEventLi
 
     }
 }
+
